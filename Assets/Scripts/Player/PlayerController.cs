@@ -21,8 +21,7 @@ public class PlayerController : MonoBehaviour
             RaycastHit hit;
             if (Physics.Raycast(cam.ScreenPointToRay(Input.mousePosition),out hit))
             {
-                print("Hit");
-            agent.destination = hit.point;
+                agent.destination = hit.point;
             }             
         }
     }
