@@ -17,6 +17,8 @@ public class StoryDisplay : MonoBehaviour
     private float _time;
     private bool _timerStart;
     private int _index = 0;
+    private bool _done = false;
+   
 
     public bool startSequence;
 
@@ -27,7 +29,6 @@ public class StoryDisplay : MonoBehaviour
 
     private void Update()
     {
-        print(_index);
         if (startSequence)
         {
             StartSequence();
@@ -39,7 +40,7 @@ public class StoryDisplay : MonoBehaviour
         {
             _time += Time.deltaTime;
 
-            if (_index < story.storyMessage.Length)
+            if (_index < story.storyMessage.Length-1)
             {
                 if (_time >= story.storyVoiceOver[_index].length)
                 {
@@ -53,6 +54,7 @@ public class StoryDisplay : MonoBehaviour
                 if (_time >= story.storyVoiceOver[_index - 1].length)
                 {
                     _timerStart = false;
+                    _done = true;
                     gameObject.transform.GetChild(0).gameObject.SetActive(false);
                 }
             }
@@ -77,7 +79,6 @@ public class StoryDisplay : MonoBehaviour
         playerAudioSource.clip = story.storyVoiceOver[i];
         playerAudioSource.Play();
         _timerStart = true;
-        //_index++;
     }
 
     private void StartSequence()
@@ -96,4 +97,16 @@ public class StoryDisplay : MonoBehaviour
             _index = 0;
         }
     }
+
+    public void SetStartSequence(bool start)
+    {
+        startSequence = start;
+    }
+
+    public bool GetDone()
+    {
+        return _done;
+    }
+    
+    
 }
