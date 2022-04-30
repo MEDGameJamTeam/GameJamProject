@@ -97,6 +97,8 @@ namespace EnvironmentSystems
         {
             CurrentWindType = WindTypes.Hurricane;
             CurrentSnowfall = Snowfall.Heavy;
+            WindDirection = new Vector3(1,0,0);
+            WindStrength = 2f;
         }
 
         // Update is called once per frame
