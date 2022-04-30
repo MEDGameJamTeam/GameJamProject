@@ -27,10 +27,13 @@ public class StoryDisplay : MonoBehaviour
 
     private void Update()
     {
+        print(_index);
         if (startSequence)
         {
             StartSequence();
+            startSequence = false;
         }
+        
 
         if (_timerStart)
         {
@@ -40,6 +43,7 @@ public class StoryDisplay : MonoBehaviour
             {
                 if (_time >= story.storyVoiceOver[_index].length)
                 {
+                    _index++;
                     _timerStart = false;
                     ShowStory(_index);
                 }
@@ -72,8 +76,8 @@ public class StoryDisplay : MonoBehaviour
         storyText.text = story.storyMessage[i];
         playerAudioSource.clip = story.storyVoiceOver[i];
         playerAudioSource.Play();
-        _index++;
         _timerStart = true;
+        //_index++;
     }
 
     private void StartSequence()
