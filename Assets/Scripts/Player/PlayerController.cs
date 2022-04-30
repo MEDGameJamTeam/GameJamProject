@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
+[RequireComponent(typeof(NavMeshAgent))]
+[RequireComponent(typeof(NavmeshMaster))]
 public class PlayerController : MonoBehaviour
 {
     public Camera cam;
@@ -24,7 +26,6 @@ public class PlayerController : MonoBehaviour
             if (Physics.Raycast(cam.ScreenPointToRay(Input.mousePosition),out hit))
             {
                 navmas.setDestination(hit.point);
-                navmas.moving = true;
             }             
         }
     }
