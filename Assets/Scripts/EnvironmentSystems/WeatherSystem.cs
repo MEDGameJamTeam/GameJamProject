@@ -1,5 +1,7 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace EnvironmentSystems
@@ -45,7 +47,7 @@ namespace EnvironmentSystems
 
         [SerializeField] private GameObject[] snowParticlePrefabs;
 
-        private List<GameObject> snowParticleChildren;
+        private List<GameObject> _snowfallParticleInstances;
 
         private ParticleSystem _currentSnowfallParticleSystem;
 
@@ -110,29 +112,45 @@ namespace EnvironmentSystems
 
         private void OnSnowfallTypeChange()
         {
-            foreach (var prefab in snowParticlePrefabs) prefab.gameObject.SetActive(false);
-
             switch (CurrentSnowfallType)
             {
                 case SnowfallType.None:
                     break;
                 case SnowfallType.Slight:
-                    snowParticleChildren[0].SetActive(true);
-                    Debug.Log("Activating " + snowParticlePrefabs[0].name);
+                    StartCoroutine(SwapActiveSnowfallParticleInstance(_snowfallParticleInstances[0]));
                     break;
                 case SnowfallType.Medium:
-                    snowParticleChildren[1].SetActive(true);
+                    StartCoroutine(SwapActiveSnowfallParticleInstance(_snowfallParticleInstances[1]));
                     break;
                 case SnowfallType.Heavy:
                     if (CurrentWindType == WindTypes.Hurricane)
-                        snowParticleChildren[3].SetActive(true);
+                        StartCoroutine(SwapActiveSnowfallParticleInstance(_snowfallParticleInstances[3]));
                     else
-                        snowParticleChildren[2].SetActive(true);
+                        StartCoroutine(SwapActiveSnowfallParticleInstance(_snowfallParticleInstances[2]));
                     break;
 
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+        }
+
+        /// <summary>
+        /// Swaps the current and new particles for a smooth transition.
+        /// </summary>
+        /// <param name="newSnowfallParticlesGameObject"></param>
+        private IEnumerator SwapActiveSnowfallParticleInstance(GameObject newSnowfallParticlesGameObject)
+        {
+            var activeSnowfallParticleInstances = _snowfallParticleInstances
+                .Where(snowfallParticleInstance => snowfallParticleInstance.activeInHierarchy).ToList();
+
+            _currentSnowfallParticleSystem = newSnowfallParticlesGameObject.GetComponent<ParticleSystem>();
+
+            newSnowfallParticlesGameObject.SetActive(true);
+
+            yield return new WaitForSeconds(5);
+
+            foreach (var activeSnowfallParticleInstance in activeSnowfallParticleInstances)
+                activeSnowfallParticleInstance.SetActive(false);
         }
 
         #endregion
@@ -150,17 +168,11 @@ namespace EnvironmentSystems
 
         private void Start()
         {
-            snowParticleChildren = new List<GameObject>();
-            
-            foreach (var prefab in snowParticlePrefabs)
-            {
-                snowParticleChildren.Add(Instantiate(prefab, transform));
-            }
+            _snowfallParticleInstances = new List<GameObject>();
 
-            foreach (var snowParticleChild in snowParticleChildren)
-            {
-                snowParticleChild.SetActive(false);
-            }
+            foreach (var prefab in snowParticlePrefabs) _snowfallParticleInstances.Add(Instantiate(prefab, transform));
+
+            foreach (var snowParticleChild in _snowfallParticleInstances) snowParticleChild.SetActive(false);
         }
 
         private void Update()
