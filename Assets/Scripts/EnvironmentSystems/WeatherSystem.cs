@@ -51,13 +51,14 @@ namespace EnvironmentSystems
 
         private ParticleSystem _currentSnowfallParticleSystem;
 
-        private float WindStrength { get; set; }
-
         #endregion
 
         #region Public Variables
 
         public Vector3 WindDirection { get; set; }
+
+        public float WindStrength { get; private set; }
+
 
         [field: SerializeField] public WindTypes CurrentWindType { get; private set; }
 
@@ -135,7 +136,7 @@ namespace EnvironmentSystems
         }
 
         /// <summary>
-        /// Swaps the current and new particles for a smooth transition.
+        ///     Swaps the current and new particles for a smooth transition.
         /// </summary>
         /// <param name="newSnowfallParticlesGameObject"></param>
         private IEnumerator SwapActiveSnowfallParticleInstance(GameObject newSnowfallParticlesGameObject)
