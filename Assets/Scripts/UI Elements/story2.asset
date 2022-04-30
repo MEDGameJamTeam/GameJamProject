@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78b4f61cb0c42e84fb998807107dd7df, type: 3}
+  m_Name: story2
+  m_EditorClassIdentifier: 
+  storyMessage:
+  - Write something here
+  - blip blop
+  storyVoiceOver:
+  - {fileID: 8300000, guid: c2e20b48b7a494b4a9d18cb1ef03d851, type: 3}
+  - {fileID: 8300000, guid: 2905e9b0c28e48142898e72ee4ee06bb, type: 3}
+  backgroundImage: {fileID: 21300000, guid: 5bb2a0b560991764ba0d75dd645eb77d, type: 3}
