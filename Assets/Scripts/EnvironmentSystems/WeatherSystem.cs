@@ -169,6 +169,8 @@ namespace EnvironmentSystems
 
         private void Start()
         {
+            WindStrength = 1f;
+
             _snowfallParticleInstances = new List<GameObject>();
 
             foreach (var prefab in snowParticlePrefabs) _snowfallParticleInstances.Add(Instantiate(prefab, transform));
@@ -178,6 +180,7 @@ namespace EnvironmentSystems
 
         private void Update()
         {
+            print(WindStrength);
             // Checks if variables have been modified since last update
             if (CurrentWindType != _mCurrentWindType)
             {
