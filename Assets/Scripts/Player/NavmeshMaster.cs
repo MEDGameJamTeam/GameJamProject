@@ -11,6 +11,8 @@ public class NavmeshMaster : MonoBehaviour
     private WeatherSystem weather;
     private float windResistance;
     private bool moving;
+    [HideInInspector]
+    public bool flicking;
     private bool isCovered;
     public float coverDistance = 3;
 
@@ -19,7 +21,6 @@ public class NavmeshMaster : MonoBehaviour
     void Start()
     {
         weather = WeatherSystem.Weather;
-        print(weather);
         agent = GetComponent<NavMeshAgent>();
         startSpeed = agent.speed;
     }
@@ -27,6 +28,14 @@ public class NavmeshMaster : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(moving)
+        {
+            this.GetComponent<Animator>().SetBool("isMoving", true);
+        }
+        else
+        {
+            this.GetComponent<Animator>().SetBool("isMoving", false);
+        }
         windResistance = Mathf.Lerp(1f * weather.WindStrength,1f / weather.WindStrength,(Vector3.Angle(weather.WindDirection, agent.velocity)/180));
         agent.speed = startSpeed * windResistance;
         RaycastHit hit;
@@ -41,16 +50,24 @@ public class NavmeshMaster : MonoBehaviour
         }
         if (!agent.pathPending)
         {
+            if (agent.remainingDistance < 0.5f)
+            {
+                moving = false;
+            }
+        }
+
+        if (!agent.pathPending)
+        {
             if (agent.remainingDistance <= agent.stoppingDistance)
             {
                 if (!agent.hasPath || agent.velocity.sqrMagnitude == 0f)
                 {
                     agent.ResetPath();
-                    if (!isCovered)
+                    if (!isCovered && !flicking)
                     {
-                        agent.velocity = weather.WindDirection.normalized * (weather.WindStrength - 1);
+                        agent.updateRotation = false;
+                        agent.velocity = Vector3.Lerp(agent.velocity, weather.WindDirection.normalized * (weather.WindStrength - 1)/3, 0.01f); 
                     }
-                    moving = false;
                 }
             }
         };
@@ -59,7 +76,12 @@ public class NavmeshMaster : MonoBehaviour
 
     public void setDestination(Vector3 des)
     {
+        agent.updateRotation = true;
         agent.destination = des;
         moving = true;
+    }
+    public void stop()
+    {
+        agent.ResetPath();
     }
 }
