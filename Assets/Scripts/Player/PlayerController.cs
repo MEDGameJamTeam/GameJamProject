@@ -7,10 +7,12 @@ public class PlayerController : MonoBehaviour
 {
     public Camera cam;
     private NavMeshAgent agent;
+    private NavmeshMaster navmas;
     // Start is called before the first frame update
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
+        navmas = GetComponent<NavmeshMaster>();
     }
 
     // Update is called once per frame
@@ -21,7 +23,8 @@ public class PlayerController : MonoBehaviour
             RaycastHit hit;
             if (Physics.Raycast(cam.ScreenPointToRay(Input.mousePosition),out hit))
             {
-                agent.destination = hit.point;
+                navmas.setDestination(hit.point);
+                navmas.moving = true;
             }             
         }
     }

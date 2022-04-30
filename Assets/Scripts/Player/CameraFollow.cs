@@ -5,10 +5,11 @@ using UnityEngine;
 public class CameraFollow : MonoBehaviour
 {
     public Transform target;
-    public Vector3 targetOffset;
+    private Vector3 targetOffset;
     // Start is called before the first frame update
     void Start()
     {
+        targetOffset = this.transform.position;
         targetOffset -= target.position;
     }
 
