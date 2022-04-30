@@ -10,7 +10,8 @@ public class NavmeshMaster : MonoBehaviour
     private NavMeshAgent agent;
     private WeatherSystem weather;
     private float windResistance;
-    private bool moving;
+    [HideInInspector]
+    public bool moving;
     [HideInInspector]
     public bool flicking;
     private bool isCovered;
@@ -21,6 +22,7 @@ public class NavmeshMaster : MonoBehaviour
     void Start()
     {
         weather = WeatherSystem.Weather;
+        weather.WindDirection = new Vector3(1,0,0);
         agent = GetComponent<NavMeshAgent>();
         startSpeed = agent.speed;
     }

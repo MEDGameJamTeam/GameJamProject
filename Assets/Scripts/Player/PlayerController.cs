@@ -9,7 +9,9 @@ public class PlayerController : MonoBehaviour
 {
     private Camera cam;
     private NavMeshAgent agent;
-    public Rigidbody egg;
+    private Rigidbody egg;
+    public AudioClip[] footSteps;
+    private AudioSource aus;
     public float maxFlickDistance;
     public float minFlickForce;
     public float maxFlickForce;
@@ -20,6 +22,7 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        aus = GetComponent<AudioSource>();
         agent = GetComponent<NavMeshAgent>();
         cam = FindObjectOfType<Camera>();
         egg = GameObject.FindGameObjectWithTag("Egg").GetComponent<Rigidbody>();
@@ -46,6 +49,11 @@ public class PlayerController : MonoBehaviour
                 Vector3 v = new Vector3(egg.transform.position.x - transform.position.x, 2, egg.transform.position.z - transform.position.z);
                 StartCoroutine(flickEgg(v));
             }
+        }
+        if (!aus.isPlaying && navmas.moving)
+        {
+            aus.clip = footSteps[1];
+            aus.Play();
         }
     }
 
