@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78b4f61cb0c42e84fb998807107dd7df, type: 3}
+  m_Name: IntroStory
+  m_EditorClassIdentifier: 
+  storyMessage:
+  - In nature it is sometimes seen that penguins will experience a sort of depression
+  - These penguins will walk away from their colony sometimes for many hundreds of
+    miles
+  - This will in the end result in the penguin meeting its certain demise
+  storyVoiceOver:
+  - {fileID: 8300000, guid: 742a92a94953a0b469070d2496f7d998, type: 3}
+  - {fileID: 8300000, guid: ca20de080db3407488e1886bb09b31ac, type: 3}
+  - {fileID: 8300000, guid: d7680474ca31f5247adc925040a16466, type: 3}
+  backgroundImage: {fileID: 0}
