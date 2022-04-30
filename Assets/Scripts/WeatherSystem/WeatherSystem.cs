@@ -1,21 +1,21 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace WeatherSystem
 {
     public class WeatherSystem : MonoBehaviour
     {
-        // Start is called before the first frame update
-        void Start()
-        {
+        public static WeatherSystem Weather { get; private set; }
+        public Vector3 WindDirection { get; private set; }
+        public float WindStrenght { get; private set; }
 
+        // Start is called before the first frame update
+        private void Start()
+        {
         }
 
         // Update is called once per frame
-        void Update()
+        private void Update()
         {
-
         }
     }
 }
