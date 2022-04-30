@@ -1,5 +1,5 @@
 using System;
-using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace EnvironmentSystems
@@ -44,6 +44,8 @@ namespace EnvironmentSystems
         #region Private Variables
 
         [SerializeField] private GameObject[] snowParticlePrefabs;
+
+        private List<GameObject> snowParticleChildren;
 
         private ParticleSystem _currentSnowfallParticleSystem;
 
@@ -108,90 +110,28 @@ namespace EnvironmentSystems
 
         private void OnSnowfallTypeChange()
         {
-            var emissionModule = _currentSnowfallParticleSystem.emission;
+            foreach (var prefab in snowParticlePrefabs) prefab.gameObject.SetActive(false);
 
             switch (CurrentSnowfallType)
             {
                 case SnowfallType.None:
-                    emissionModule.enabled = false;
                     break;
                 case SnowfallType.Slight:
-                    emissionModule.enabled = true;
-                    emissionModule.rateOverTimeMultiplier = 5;
+                    snowParticleChildren[0].SetActive(true);
+                    Debug.Log("Activating " + snowParticlePrefabs[0].name);
                     break;
                 case SnowfallType.Medium:
-                    emissionModule.enabled = true;
-                    emissionModule.rateOverTimeMultiplier = 12;
+                    snowParticleChildren[1].SetActive(true);
                     break;
                 case SnowfallType.Heavy:
-                    emissionModule.enabled = true;
-                    emissionModule.rateOverTimeMultiplier = 24;
+                    if (CurrentWindType == WindTypes.Hurricane)
+                        snowParticleChildren[3].SetActive(true);
+                    else
+                        snowParticleChildren[2].SetActive(true);
                     break;
 
                 default:
                     throw new ArgumentOutOfRangeException();
-            }
-        }
-
-        private float GetSnowfallMultiplier()
-        {
-            switch (CurrentSnowfallType)
-            {
-                case SnowfallType.None:
-                    return 0f;
-                case SnowfallType.Slight:
-                    return 10f;
-                case SnowfallType.Medium:
-                    return 20f;
-                case SnowfallType.Heavy:
-                    return 30f;
-
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }
-
-        private GameObject GetSnowfallParticlePrefab()
-        {
-            switch (CurrentSnowfallType)
-            {
-                case SnowfallType.None:
-                    return null;
-                case SnowfallType.Slight:
-                    return snowParticlePrefabs[0];
-                case SnowfallType.Medium:
-                    return snowParticlePrefabs[1];
-                case SnowfallType.Heavy:
-                    if (CurrentWindType == WindTypes.Hurricane) return snowParticlePrefabs[3];
-                    return snowParticlePrefabs[2];
-
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }
-
-        private IEnumerator SwitchSnowfallParticles(GameObject newSnowfallParticlesGameObject)
-        {
-            var newSnowfallParticleSystem = newSnowfallParticlesGameObject.GetComponent<ParticleSystem>();
-
-            if (_currentSnowfallParticleSystem == null) _currentSnowfallParticleSystem = newSnowfallParticleSystem;
-
-            if (_currentSnowfallParticleSystem != newSnowfallParticleSystem)
-            {
-                var currentEmissionModule = _currentSnowfallParticleSystem.emission;
-                var newEmissionModule = newSnowfallParticleSystem.emission;
-
-                while (currentEmissionModule.rateOverTimeMultiplier > 0)
-                {
-                    if (currentEmissionModule.rateOverTimeMultiplier > 0)
-                        currentEmissionModule.rateOverTimeMultiplier -= 1;
-                    if (newEmissionModule.rateOverTimeMultiplier < GetSnowfallMultiplier())
-                        newEmissionModule.rateOverTimeMultiplier -= 1;
-
-                    yield return new WaitForFixedUpdate();
-                }
-
-                _currentSnowfallParticleSystem = newSnowfallParticleSystem;
             }
         }
 
@@ -210,18 +150,17 @@ namespace EnvironmentSystems
 
         private void Start()
         {
-            CurrentWindType = WindTypes.Hurricane;
-            CurrentSnowfallType = SnowfallType.Heavy;
-
+            snowParticleChildren = new List<GameObject>();
+            
             foreach (var prefab in snowParticlePrefabs)
             {
-                Instantiate(prefab, transform);
-                var emissionModule = prefab.GetComponent<ParticleSystem>().emission;
-                emissionModule.rateOverTimeMultiplier = 0;
-                emissionModule.enabled = false;
+                snowParticleChildren.Add(Instantiate(prefab, transform));
             }
 
-            StartCoroutine(SwitchSnowfallParticles(GetSnowfallParticlePrefab()));
+            foreach (var snowParticleChild in snowParticleChildren)
+            {
+                snowParticleChild.SetActive(false);
+            }
         }
 
         private void Update()
@@ -237,7 +176,6 @@ namespace EnvironmentSystems
             {
                 _mCurrentSnowfallType = CurrentSnowfallType;
                 OnSnowfallTypeChange();
-                StartCoroutine(SwitchSnowfallParticles(GetSnowfallParticlePrefab()));
             }
 
             if (WindDirection != _mWindDirection)
