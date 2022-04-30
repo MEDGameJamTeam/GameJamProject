@@ -22,32 +22,44 @@ namespace EnvironmentSystems
         }
 
         [SerializeField] private ParticleSystem snowParticleSystem;
+
         public static WeatherSystem Weather { get; private set; }
-        public Vector3 WindDirection { get; private set; }
+
+        public Vector3 WindDirection { get; set; }
         public float WindStrength { get; private set; }
         public WindTypes CurrentWindType { get; private set; }
         public Snowfall CurrentSnowfall { get; private set; }
 
+
         private void UpdateWindStrength()
         {
             var forceOverLifetimeModule = snowParticleSystem.forceOverLifetime;
+            var normalizedWindDirection = WindDirection.normalized;
+            var particleMultiplier = 3;
 
             switch (CurrentWindType)
             {
                 case WindTypes.Still:
                     forceOverLifetimeModule.enabled = false;
+                    WindStrength = 1;
                     break;
                 case WindTypes.Breeze:
+                    WindStrength = 1.2f;
                     forceOverLifetimeModule.enabled = true;
-                    forceOverLifetimeModule.xMultiplier = 1;
+                    forceOverLifetimeModule.xMultiplier = normalizedWindDirection.x * WindStrength * particleMultiplier;
+                    forceOverLifetimeModule.zMultiplier = normalizedWindDirection.z * WindStrength * particleMultiplier;
                     break;
                 case WindTypes.Strong:
+                    WindStrength = 2.0f;
                     forceOverLifetimeModule.enabled = true;
-                    forceOverLifetimeModule.xMultiplier = 2;
+                    forceOverLifetimeModule.xMultiplier = normalizedWindDirection.x * WindStrength * particleMultiplier;
+                    forceOverLifetimeModule.zMultiplier = normalizedWindDirection.z * WindStrength * particleMultiplier;
                     break;
                 case WindTypes.Hurricane:
+                    WindStrength = 5.5f;
                     forceOverLifetimeModule.enabled = true;
-                    forceOverLifetimeModule.xMultiplier = 2;
+                    forceOverLifetimeModule.xMultiplier = normalizedWindDirection.x * WindStrength * particleMultiplier;
+                    forceOverLifetimeModule.zMultiplier = normalizedWindDirection.z * WindStrength * particleMultiplier;
                     break;
 
                 default:
