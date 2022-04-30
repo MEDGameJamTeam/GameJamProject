@@ -1,11 +1,22 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace EnvironmentSystems
 {
     public class WeatherSystem : MonoBehaviour
     {
-        public enum Snowfall
+        #region Static Variables
+
+        public static WeatherSystem Weather { get; private set; }
+
+        #endregion
+
+        #region Public Enums
+
+        public enum SnowfallType
         {
             None,
             Slight,
@@ -21,33 +32,66 @@ namespace EnvironmentSystems
             Hurricane
         }
 
-        [SerializeField] private ParticleSystem snowParticleSystem;
-        public static WeatherSystem Weather { get; private set; }
-        public Vector3 WindDirection { get; private set; }
-        public float WindStrength { get; private set; }
-        public WindTypes CurrentWindType { get; private set; }
-        public Snowfall CurrentSnowfall { get; private set; }
+        #endregion
 
-        private void UpdateWindStrength()
+        #region Modify Variables
+
+        // Variables used to check for modification
+        private WindTypes _mCurrentWindType;
+        private SnowfallType _mCurrentSnowfallType;
+        private Vector3 _mWindDirection;
+
+        #endregion
+
+        #region Private Variables
+
+        [SerializeField] private GameObject[] snowParticlePrefabs;
+
+        private List<GameObject> _snowfallParticleInstances;
+
+        private ParticleSystem _currentSnowfallParticleSystem;
+
+        #endregion
+
+        #region Public Variables
+
+        public Vector3 WindDirection { get; set; }
+
+        public float WindStrength { get; private set; }
+
+
+        [field: SerializeField] public WindTypes CurrentWindType { get; private set; }
+
+        [field: SerializeField] public SnowfallType CurrentSnowfallType { get; private set; }
+
+        #endregion
+
+        #region Private Methods
+
+        private void OnWindTypeChange()
         {
-            var forceOverLifetimeModule = snowParticleSystem.forceOverLifetime;
+            var forceOverLifetimeModule = _currentSnowfallParticleSystem.forceOverLifetime;
 
             switch (CurrentWindType)
             {
                 case WindTypes.Still:
                     forceOverLifetimeModule.enabled = false;
+                    WindStrength = 1;
                     break;
                 case WindTypes.Breeze:
+                    WindStrength = 1.2f;
                     forceOverLifetimeModule.enabled = true;
-                    forceOverLifetimeModule.xMultiplier = 1;
+                    UpdateParticleSystemToMatchWindDirection();
                     break;
                 case WindTypes.Strong:
+                    WindStrength = 2.0f;
                     forceOverLifetimeModule.enabled = true;
-                    forceOverLifetimeModule.xMultiplier = 2;
+                    UpdateParticleSystemToMatchWindDirection();
                     break;
                 case WindTypes.Hurricane:
+                    WindStrength = 5.5f;
                     forceOverLifetimeModule.enabled = true;
-                    forceOverLifetimeModule.xMultiplier = 2;
+                    UpdateParticleSystemToMatchWindDirection();
                     break;
 
                 default:
@@ -55,26 +99,35 @@ namespace EnvironmentSystems
             }
         }
 
-        private void UpdateSnowfallAmount()
+        private void UpdateParticleSystemToMatchWindDirection()
         {
-            var emissionModule = snowParticleSystem.emission;
+            var forceOverLifetimeModule = _currentSnowfallParticleSystem.forceOverLifetime;
+            var normalizedWindDirection = WindDirection.normalized;
+            var particleMultiplier = 3;
 
-            switch (CurrentSnowfall)
+            if (!forceOverLifetimeModule.enabled) return;
+
+            forceOverLifetimeModule.xMultiplier = normalizedWindDirection.x * WindStrength * particleMultiplier;
+            forceOverLifetimeModule.zMultiplier = normalizedWindDirection.z * WindStrength * particleMultiplier;
+        }
+
+        private void OnSnowfallTypeChange()
+        {
+            switch (CurrentSnowfallType)
             {
-                case Snowfall.None:
-                    emissionModule.enabled = false;
+                case SnowfallType.None:
                     break;
-                case Snowfall.Slight:
-                    emissionModule.enabled = true;
-                    emissionModule.rateOverTimeMultiplier = 5;
+                case SnowfallType.Slight:
+                    StartCoroutine(SwapActiveSnowfallParticleInstance(_snowfallParticleInstances[0]));
                     break;
-                case Snowfall.Medium:
-                    emissionModule.enabled = true;
-                    emissionModule.rateOverTimeMultiplier = 12;
+                case SnowfallType.Medium:
+                    StartCoroutine(SwapActiveSnowfallParticleInstance(_snowfallParticleInstances[1]));
                     break;
-                case Snowfall.Heavy:
-                    emissionModule.enabled = true;
-                    emissionModule.rateOverTimeMultiplier = 24;
+                case SnowfallType.Heavy:
+                    if (CurrentWindType == WindTypes.Hurricane)
+                        StartCoroutine(SwapActiveSnowfallParticleInstance(_snowfallParticleInstances[3]));
+                    else
+                        StartCoroutine(SwapActiveSnowfallParticleInstance(_snowfallParticleInstances[2]));
                     break;
 
                 default:
@@ -82,7 +135,28 @@ namespace EnvironmentSystems
             }
         }
 
-        #region UnityEventFunctions
+        /// <summary>
+        ///     Swaps the current and new particles for a smooth transition.
+        /// </summary>
+        /// <param name="newSnowfallParticlesGameObject"></param>
+        private IEnumerator SwapActiveSnowfallParticleInstance(GameObject newSnowfallParticlesGameObject)
+        {
+            var activeSnowfallParticleInstances = _snowfallParticleInstances
+                .Where(snowfallParticleInstance => snowfallParticleInstance.activeInHierarchy).ToList();
+
+            _currentSnowfallParticleSystem = newSnowfallParticlesGameObject.GetComponent<ParticleSystem>();
+
+            newSnowfallParticlesGameObject.SetActive(true);
+
+            yield return new WaitForSeconds(5);
+
+            foreach (var activeSnowfallParticleInstance in activeSnowfallParticleInstances)
+                activeSnowfallParticleInstance.SetActive(false);
+        }
+
+        #endregion
+
+        #region Unity Event Functions
 
         private void Awake()
         {
@@ -95,17 +169,36 @@ namespace EnvironmentSystems
 
         private void Start()
         {
-            CurrentWindType = WindTypes.Hurricane;
-            CurrentSnowfall = Snowfall.Heavy;
-            WindDirection = new Vector3(1,0,0);
-            WindStrength = 2f;
+            WindStrength = 1f;
+
+            _snowfallParticleInstances = new List<GameObject>();
+
+            foreach (var prefab in snowParticlePrefabs) _snowfallParticleInstances.Add(Instantiate(prefab, transform));
+
+            foreach (var snowParticleChild in _snowfallParticleInstances) snowParticleChild.SetActive(false);
         }
 
-        // Update is called once per frame
         private void Update()
         {
-            UpdateWindStrength();
-            UpdateSnowfallAmount();
+            print(WindStrength);
+            // Checks if variables have been modified since last update
+            if (CurrentWindType != _mCurrentWindType)
+            {
+                _mCurrentWindType = CurrentWindType;
+                OnWindTypeChange();
+            }
+
+            if (CurrentSnowfallType != _mCurrentSnowfallType)
+            {
+                _mCurrentSnowfallType = CurrentSnowfallType;
+                OnSnowfallTypeChange();
+            }
+
+            if (WindDirection != _mWindDirection)
+            {
+                _mWindDirection = WindDirection;
+                UpdateParticleSystemToMatchWindDirection();
+            }
         }
 
         #endregion
