@@ -1,12 +1,13 @@
-using System.Collections;
-using System.Collections.Generic;
+using EnvironmentSystems;
 using UnityEngine;
 using UnityEngine.AI;
-using EnvironmentSystems;
 
 [RequireComponent(typeof(NavMeshAgent))]
 public class NavmeshMaster : MonoBehaviour
 {
+    [HideInInspector] public bool flicking;
+
+    public float coverDistance = 3;
     private NavMeshAgent agent;
     private WeatherSystem weather;
     private float windResistance;
@@ -15,11 +16,15 @@ public class NavmeshMaster : MonoBehaviour
     [HideInInspector]
     public bool flicking;
     private bool isCovered;
-    public float coverDistance = 3;
+    private bool moving;
 
     private float startSpeed;
+    private WeatherSystem weather;
+
+    private float windResistance;
+
     // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
         weather = WeatherSystem.Weather;
         weather.WindDirection = new Vector3(1,0,0);
@@ -28,51 +33,43 @@ public class NavmeshMaster : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        if(moving)
-        {
-            this.GetComponent<Animator>().SetBool("isMoving", true);
-        }
+        if (moving)
+            GetComponent<Animator>().SetBool("isMoving", true);
         else
-        {
-            this.GetComponent<Animator>().SetBool("isMoving", false);
-        }
-        windResistance = Mathf.Lerp(1f * weather.WindStrength,1f / weather.WindStrength,(Vector3.Angle(weather.WindDirection, agent.velocity)/180));
+            GetComponent<Animator>().SetBool("isMoving", false);
+        windResistance = Mathf.Lerp(1f * weather.WindStrength, 1f / weather.WindStrength,
+            Vector3.Angle(weather.WindDirection, agent.velocity) / 180);
+        
+        windResistance = 1;
+
         agent.speed = startSpeed * windResistance;
         RaycastHit hit;
-        Ray ray = new Ray(transform.position, -weather.WindDirection);
-        if (Physics.Raycast(ray,out hit, coverDistance))
-        {
+        var ray = new Ray(transform.position, -weather.WindDirection);
+        
+        if (Physics.Raycast(ray, out hit, coverDistance))
             isCovered = true;
-        }
         else
-        {
             isCovered = false;
-        }
         if (!agent.pathPending)
-        {
             if (agent.remainingDistance < 0.5f)
-            {
                 moving = false;
-            }
-        }
 
         if (!agent.pathPending)
-        {
             if (agent.remainingDistance <= agent.stoppingDistance)
-            {
                 if (!agent.hasPath || agent.velocity.sqrMagnitude == 0f)
                 {
                     agent.ResetPath();
                     if (!isCovered && !flicking)
                     {
                         agent.updateRotation = false;
-                        agent.velocity = Vector3.Lerp(agent.velocity, weather.WindDirection.normalized * (weather.WindStrength - 1)/3, 0.01f); 
+                        agent.velocity = Vector3.Lerp(agent.velocity,
+                            weather.WindDirection.normalized * (weather.WindStrength - 1) / 3, 0.01f);
                     }
                 }
-            }
-        };
+
+        ;
     }
 
 
@@ -82,6 +79,7 @@ public class NavmeshMaster : MonoBehaviour
         agent.destination = des;
         moving = true;
     }
+
     public void stop()
     {
         agent.ResetPath();

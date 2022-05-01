@@ -1,21 +1,26 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class CameraFollow : MonoBehaviour
+namespace Player
 {
-    public Transform target;
-    private Vector3 targetOffset;
-    // Start is called before the first frame update
-    void Start()
+    public class CameraFollow : MonoBehaviour
     {
-        targetOffset = this.transform.position;
-        targetOffset -= target.position;
-    }
+        public Transform target;
 
-    // Update is called once per frame
-    void Update()
-    {
-        transform.position = Vector3.Lerp(transform.position, target.position+targetOffset, 0.001f);
+        [SerializeField] private float cameraSpeed = 0.001f;
+
+        private Vector3 _targetOffset;
+
+        // Start is called before the first frame update
+        private void Start()
+        {
+            _targetOffset = transform.position;
+            _targetOffset -= target.position;
+        }
+
+        // Update is called once per frame
+        private void Update()
+        {
+            transform.position = Vector3.Lerp(transform.position, target.position + _targetOffset, cameraSpeed);
+        }
     }
 }
