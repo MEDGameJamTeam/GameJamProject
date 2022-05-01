@@ -813,12 +813,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6cfa63bc109aac4888403104002154e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  egg: {fileID: 0}
   footSteps:
   - {fileID: 8300000, guid: 3605df4df4973974889e83e85fae17fb, type: 3}
   - {fileID: 8300000, guid: b69ce788fc2378d439c38e1ecde27e91, type: 3}
   maxFlickDistance: 2
   minFlickForce: 50
-  maxFlickForce: 600
+  maxFlickForce: 2000
 --- !u!114 &4996840068650909043
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -844,7 +845,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.5
-  m_Speed: 1.5
+  m_Speed: 4
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 360
