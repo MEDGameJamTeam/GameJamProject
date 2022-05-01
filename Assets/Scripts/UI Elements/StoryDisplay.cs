@@ -24,7 +24,7 @@ public class StoryDisplay : MonoBehaviour
 
     void Start()
     {
-        background.sprite = story.backgroundImage;
+        background.sprite = story.backgroundImage[0];
     }
 
     private void Update()
@@ -76,6 +76,7 @@ public class StoryDisplay : MonoBehaviour
         _time = 0;
         gameObject.transform.GetChild(0).gameObject.SetActive(true);
         storyText.text = story.storyMessage[i];
+        background.sprite = story.backgroundImage[i];
         playerAudioSource.clip = story.storyVoiceOver[i];
         playerAudioSource.Play();
         _timerStart = true;
