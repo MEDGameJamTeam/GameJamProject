@@ -39,7 +39,6 @@ namespace EnvironmentSystems
         // Variables used to check for modification
         private WindTypes _mCurrentWindType;
         private SnowfallType _mCurrentSnowfallType;
-        private Vector3 _mWindDirection;
 
         #endregion
 
@@ -57,12 +56,11 @@ namespace EnvironmentSystems
 
         public Vector3 WindDirection { get; set; }
 
-        public float WindStrength { get; private set; }
+        public float WindStrength { get; set; }
 
+        [field: SerializeField] public WindTypes CurrentWindType { get; set; }
 
-        [field: SerializeField] public WindTypes CurrentWindType { get; private set; }
-
-        [field: SerializeField] public SnowfallType CurrentSnowfallType { get; private set; }
+        [field: SerializeField] public SnowfallType CurrentSnowfallType { get; set; }
 
         #endregion
 
@@ -76,39 +74,20 @@ namespace EnvironmentSystems
             {
                 case WindTypes.Still:
                     forceOverLifetimeModule.enabled = false;
-                    WindStrength = 1;
                     break;
                 case WindTypes.Breeze:
-                    WindStrength = 1.2f;
                     forceOverLifetimeModule.enabled = true;
-                    UpdateParticleSystemToMatchWindDirection();
                     break;
                 case WindTypes.Strong:
-                    WindStrength = 2.0f;
-                    forceOverLifetimeModule.enabled = true;
-                    UpdateParticleSystemToMatchWindDirection();
+                    forceOverLifetimeModule.enabled = true; 
                     break;
                 case WindTypes.Hurricane:
-                    WindStrength = 5.5f;
                     forceOverLifetimeModule.enabled = true;
-                    UpdateParticleSystemToMatchWindDirection();
                     break;
 
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-        }
-
-        private void UpdateParticleSystemToMatchWindDirection()
-        {
-            var forceOverLifetimeModule = _currentSnowfallParticleSystem.forceOverLifetime;
-            var normalizedWindDirection = WindDirection.normalized;
-            var particleMultiplier = 3;
-
-            if (!forceOverLifetimeModule.enabled) return;
-
-            forceOverLifetimeModule.xMultiplier = normalizedWindDirection.x * WindStrength * particleMultiplier;
-            forceOverLifetimeModule.zMultiplier = normalizedWindDirection.z * WindStrength * particleMultiplier;
         }
 
         private void OnSnowfallTypeChange()
@@ -148,7 +127,7 @@ namespace EnvironmentSystems
 
             newSnowfallParticlesGameObject.SetActive(true);
 
-            yield return new WaitForSeconds(5);
+            yield return new WaitForSeconds(1);
 
             foreach (var activeSnowfallParticleInstance in activeSnowfallParticleInstances)
                 activeSnowfallParticleInstance.SetActive(false);
@@ -176,28 +155,22 @@ namespace EnvironmentSystems
             foreach (var prefab in snowParticlePrefabs) _snowfallParticleInstances.Add(Instantiate(prefab, transform));
 
             foreach (var snowParticleChild in _snowfallParticleInstances) snowParticleChild.SetActive(false);
+
+            _currentSnowfallParticleSystem = _snowfallParticleInstances[0].GetComponent<ParticleSystem>();
         }
 
         private void Update()
         {
-            print(WindStrength);
-            // Checks if variables have been modified since last update
-            if (CurrentWindType != _mCurrentWindType)
-            {
-                _mCurrentWindType = CurrentWindType;
-                OnWindTypeChange();
-            }
-
             if (CurrentSnowfallType != _mCurrentSnowfallType)
             {
                 _mCurrentSnowfallType = CurrentSnowfallType;
                 OnSnowfallTypeChange();
             }
 
-            if (WindDirection != _mWindDirection)
+            if (CurrentWindType != _mCurrentWindType)
             {
-                _mWindDirection = WindDirection;
-                UpdateParticleSystemToMatchWindDirection();
+                _mCurrentWindType = CurrentWindType;
+                OnWindTypeChange();
             }
         }
 

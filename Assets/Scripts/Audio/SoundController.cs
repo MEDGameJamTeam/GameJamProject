@@ -1,88 +1,90 @@
 using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using EnvironmentSystems;
+using UnityEngine;
 
-public class SoundController : MonoBehaviour
+namespace Audio
 {
-    public AudioClip[] ambience;
-    private WeatherSystem ws;
-    private WeatherSystem.WindTypes currentWind;
-
-    private AudioSource breeze, strong, hurricane;
-    // Start is called before the first frame update
-    void Start()
+    public class SoundController : MonoBehaviour
     {
-        breeze = gameObject.AddComponent<AudioSource>();
-        strong = gameObject.AddComponent<AudioSource>();
-        hurricane = gameObject.AddComponent<AudioSource>();
-        breeze.clip = ambience[0];
-        strong.clip = ambience[1];
-        hurricane.clip = ambience[2];
-        breeze.loop = true;
-        strong.loop = true;
-        hurricane.loop = true;
-        breeze.volume = 0;
-        strong.volume = 0;
-        hurricane.volume = 0;
-        breeze.Play();
-        strong.Play();
-        hurricane.Play();
-        ws = WeatherSystem.Weather;
-    }
+        public AudioClip[] ambience;
+        private WeatherSystem _ws;
+        private WeatherSystem.WindTypes _currentWind;
 
-    // Update is called once per frame
-    void Update()
-    {
-        if (currentWind != ws.CurrentWindType)
+        private AudioSource _breeze, _strong, _hurricane;
+        // Start is called before the first frame update
+        void Start()
         {
-            switch(ws.CurrentWindType)
+            _breeze = gameObject.AddComponent<AudioSource>();
+            _strong = gameObject.AddComponent<AudioSource>();
+            _hurricane = gameObject.AddComponent<AudioSource>();
+            _breeze.clip = ambience[0];
+            _strong.clip = ambience[1];
+            _hurricane.clip = ambience[2];
+            _breeze.loop = true;
+            _strong.loop = true;
+            _hurricane.loop = true;
+            _breeze.volume = 0;
+            _strong.volume = 0;
+            _hurricane.volume = 0;
+            _breeze.Play();
+            _strong.Play();
+            _hurricane.Play();
+            _ws = WeatherSystem.Weather;
+        }
+
+        // Update is called once per frame
+        void Update()
+        {
+            if (_currentWind != _ws.CurrentWindType)
             {
-                case WeatherSystem.WindTypes.Still:
-                    StartCoroutine(fadeout(breeze));
-                    StartCoroutine(fadeout(strong));
-                    StartCoroutine(fadeout(hurricane));
-                break;
-                case WeatherSystem.WindTypes.Breeze:
-                    StartCoroutine(fadein(breeze));
-                    StartCoroutine(fadeout(strong));
-                    StartCoroutine(fadeout(hurricane));
-                break;
-                case WeatherSystem.WindTypes.Strong:
-                    StartCoroutine(fadeout(breeze));
-                    StartCoroutine(fadein(strong));
-                    StartCoroutine(fadeout(hurricane));
-                break;
-                case WeatherSystem.WindTypes.Hurricane:
-                    StartCoroutine(fadeout(breeze));
-                    StartCoroutine(fadeout(strong));
-                    StartCoroutine(fadein(hurricane));
-                break;
+                switch(_ws.CurrentWindType)
+                {
+                    case WeatherSystem.WindTypes.Still:
+                        StartCoroutine(Fadeout(_breeze));
+                        StartCoroutine(Fadeout(_strong));
+                        StartCoroutine(Fadeout(_hurricane));
+                        break;
+                    case WeatherSystem.WindTypes.Breeze:
+                        StartCoroutine(Fadein(_breeze));
+                        StartCoroutine(Fadeout(_strong));
+                        StartCoroutine(Fadeout(_hurricane));
+                        break;
+                    case WeatherSystem.WindTypes.Strong:
+                        StartCoroutine(Fadeout(_breeze));
+                        StartCoroutine(Fadein(_strong));
+                        StartCoroutine(Fadeout(_hurricane));
+                        break;
+                    case WeatherSystem.WindTypes.Hurricane:
+                        StartCoroutine(Fadeout(_breeze));
+                        StartCoroutine(Fadeout(_strong));
+                        StartCoroutine(Fadein(_hurricane));
+                        break;
                 
+                }
             }
+            _currentWind = _ws.CurrentWindType;
         }
-        currentWind = ws.CurrentWindType;
-    }
 
-    IEnumerator fadeout(AudioSource aus)
-    {
-        while (aus.volume > 0.01f)
+        IEnumerator Fadeout(AudioSource aus)
         {
-            aus.volume -= 0.001f;
+            while (aus.volume > 0.01f)
+            {
+                aus.volume -= 0.03f;
+                yield return null;
+            }
+            aus.volume = 0f;
             yield return null;
         }
-        aus.volume = 0f;
-        yield return null;
-    }
 
-    IEnumerator fadein(AudioSource aus)
-    {
-        while (aus.volume < 0.99f)
+        IEnumerator Fadein(AudioSource aus)
         {
-            aus.volume += 0.001f;
+            while (aus.volume < 0.99f)
+            {
+                aus.volume += 0.001f;
+                yield return null;
+            }
+            aus.volume = 1f;
             yield return null;
         }
-        aus.volume = 1f;
-        yield return null;
     }
 }
