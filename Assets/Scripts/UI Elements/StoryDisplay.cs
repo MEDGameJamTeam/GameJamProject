@@ -17,6 +17,8 @@ public class StoryDisplay : MonoBehaviour
     private float _time;
     private bool _timerStart;
     private int _index = 0;
+    private bool _done = false;
+   
 
     public bool startSequence;
 
@@ -30,16 +32,19 @@ public class StoryDisplay : MonoBehaviour
         if (startSequence)
         {
             StartSequence();
+            startSequence = false;
         }
+        
 
         if (_timerStart)
         {
             _time += Time.deltaTime;
 
-            if (_index < story.storyMessage.Length)
+            if (_index < story.storyMessage.Length-1)
             {
                 if (_time >= story.storyVoiceOver[_index].length)
                 {
+                    _index++;
                     _timerStart = false;
                     ShowStory(_index);
                 }
@@ -49,6 +54,7 @@ public class StoryDisplay : MonoBehaviour
                 if (_time >= story.storyVoiceOver[_index - 1].length)
                 {
                     _timerStart = false;
+                    _done = true;
                     gameObject.transform.GetChild(0).gameObject.SetActive(false);
                 }
             }
@@ -72,7 +78,6 @@ public class StoryDisplay : MonoBehaviour
         storyText.text = story.storyMessage[i];
         playerAudioSource.clip = story.storyVoiceOver[i];
         playerAudioSource.Play();
-        _index++;
         _timerStart = true;
     }
 
@@ -92,4 +97,16 @@ public class StoryDisplay : MonoBehaviour
             _index = 0;
         }
     }
+
+    public void SetStartSequence(bool start)
+    {
+        startSequence = start;
+    }
+
+    public bool GetDone()
+    {
+        return _done;
+    }
+    
+    
 }

@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   storyMessage:
   - In nature it is sometimes seen that penguins will experience a sort of depression
-  - These penguins will walk away from their colony sometimes for many hundreds of
-    miles
+  - These penguins will walk away from their colony sometimes travelling hundreds
+    of miles
   - This will in the end result in the penguin meeting its certain demise
   storyVoiceOver:
   - {fileID: 8300000, guid: 742a92a94953a0b469070d2496f7d998, type: 3}
