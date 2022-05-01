@@ -18,6 +18,8 @@ public class StoryDisplay : MonoBehaviour
     private bool _timerStart;
     private int _index = 0;
     private bool _done = false;
+
+    [SerializeField] private GameObject removeThings;
    
 
     public bool startSequence;
@@ -51,11 +53,11 @@ public class StoryDisplay : MonoBehaviour
             }
             else
             {
-                if (_time >= story.storyVoiceOver[_index - 1].length)
+                if (_time >= story.storyVoiceOver[_index].length)
                 {
                     _timerStart = false;
                     _done = true;
-                    gameObject.transform.GetChild(0).gameObject.SetActive(false);
+                    removeThings.SetActive(false);
                 }
             }
         }
@@ -74,7 +76,7 @@ public class StoryDisplay : MonoBehaviour
     void ShowStory(int i)
     {
         _time = 0;
-        gameObject.transform.GetChild(0).gameObject.SetActive(true);
+        removeThings.SetActive(true);
         storyText.text = story.storyMessage[i];
         background.sprite = story.backgroundImage[i];
         playerAudioSource.clip = story.storyVoiceOver[i];
@@ -94,7 +96,7 @@ public class StoryDisplay : MonoBehaviour
         if (other.name == player.name)
         {
             _timerStart = false;
-            gameObject.transform.GetChild(0).gameObject.SetActive(false);
+            removeThings.SetActive(false);
             _index = 0;
         }
     }
