@@ -12,11 +12,8 @@ EditorBuildSettings:
     path: Assets/Scenes/Intro.unity
     guid: 1f7a83ca23bb6094bbf45ec1bfd06113
   - enabled: 1
-    path: Assets/Scenes/NavMeshTesting.unity
-    guid: 64369adcb4e74094b8a85420c865acce
-  - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
-    guid: 99c9720ab356a0642a771bea13969a05
+    path: Assets/Scenes/MainScene/MainScene.unity
+    guid: 3ce2dbdb19dde654b95c9b1f8fde67d1
   - enabled: 1
     path: Assets/Scenes/SadEnding.unity
     guid: b8e9dd79312389b429f63397100ce180
@@ -25,5 +22,5 @@ EditorBuildSettings:
     guid: f21e992ece29acf439d3d2b03925b251
   - enabled: 1
     path: Assets/Scenes/EndCredits.unity
-    guid: b3e51472674713f40996c62fc7e832c0
+    guid: 39f3c2e86101b40448e98353bdc20669
   m_configObjects: {}
