@@ -78,12 +78,12 @@ namespace Audio
 
         IEnumerator Fadein(AudioSource aus)
         {
-            while (aus.volume < 0.99f)
+            while (aus.volume < 0.40f)
             {
                 aus.volume += 0.001f;
                 yield return null;
             }
-            aus.volume = 1f;
+            aus.volume = 0.4f;
             yield return null;
         }
     }
