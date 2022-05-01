@@ -29,10 +29,10 @@ public class fadeoutending : MonoBehaviour
         {
             print(faded);
             img.color = new Color(img.color.r, img.color.g, img.color.b, faded);
-            faded += .0001f;
+            faded += .0002f;
             yield return null;
         }
-        SceneManager.LoadScene("EndCredits");
+        SceneManager.LoadScene(5);
         yield return null;
     }
 }

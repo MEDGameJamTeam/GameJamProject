@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class textScroller : MonoBehaviour
 {
@@ -14,9 +15,14 @@ public class textScroller : MonoBehaviour
 
     private void FixedUpdate() 
     {
-        for (int i = 0; i < text.Length; i++)
+        foreach (RectTransform r in text)
         {
-            text[i].position += new Vector3(0,1,0);
+            r.position += new Vector3(0,1,0);
+        }
+
+        if (text[text.Length-1].position.y > 450)
+        {
+            SceneManager.LoadScene(0);
         }
     }
 }
