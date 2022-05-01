@@ -8,28 +8,24 @@ public class NavmeshMaster : MonoBehaviour
     [HideInInspector] public bool flicking;
 
     public float coverDistance = 3;
-    private NavMeshAgent agent;
-    private WeatherSystem weather;
-    private float windResistance;
-    [HideInInspector]
-    public bool moving;
-    [HideInInspector]
-    public bool flicking;
-    private bool isCovered;
-    private bool moving;
 
-    private float startSpeed;
-    private WeatherSystem weather;
+    [HideInInspector] public bool moving;
 
-    private float windResistance;
+    private NavMeshAgent _agent;
+    private bool _isCovered;
+
+    private float _startSpeed;
+    private WeatherSystem _weather;
+
+    private float _windResistance;
 
     // Start is called before the first frame update
     private void Start()
     {
-        weather = WeatherSystem.Weather;
-        weather.WindDirection = new Vector3(1,0,0);
-        agent = GetComponent<NavMeshAgent>();
-        startSpeed = agent.speed;
+        _weather = WeatherSystem.Weather;
+        _weather.WindDirection = new Vector3(1, 0, 0);
+        _agent = GetComponent<NavMeshAgent>();
+        _startSpeed = _agent.speed;
     }
 
     // Update is called once per frame
@@ -39,49 +35,46 @@ public class NavmeshMaster : MonoBehaviour
             GetComponent<Animator>().SetBool("isMoving", true);
         else
             GetComponent<Animator>().SetBool("isMoving", false);
-        windResistance = Mathf.Lerp(1f * weather.WindStrength, 1f / weather.WindStrength,
-            Vector3.Angle(weather.WindDirection, agent.velocity) / 180);
-        
-        windResistance = 1;
+        _windResistance = Mathf.Lerp(1f * _weather.WindStrength, 1f / _weather.WindStrength,
+            Vector3.Angle(_weather.WindDirection, _agent.velocity) / 180);
 
-        agent.speed = startSpeed * windResistance;
+        _windResistance = 1;
+
+        _agent.speed = _startSpeed * _windResistance;
         RaycastHit hit;
-        var ray = new Ray(transform.position, -weather.WindDirection);
-        
+        var ray = new Ray(transform.position, -_weather.WindDirection);
+
         if (Physics.Raycast(ray, out hit, coverDistance))
-            isCovered = true;
+            _isCovered = true;
         else
-            isCovered = false;
-        if (!agent.pathPending)
-            if (agent.remainingDistance < 0.5f)
+            _isCovered = false;
+        if (!_agent.pathPending)
+            if (_agent.remainingDistance < 0.5f)
                 moving = false;
 
-        if (!agent.pathPending)
-            if (agent.remainingDistance <= agent.stoppingDistance)
-                if (!agent.hasPath || agent.velocity.sqrMagnitude == 0f)
-                {
-                    agent.ResetPath();
-                    if (!isCovered && !flicking)
-                    {
-                        agent.updateRotation = false;
-                        agent.velocity = Vector3.Lerp(agent.velocity,
-                            weather.WindDirection.normalized * (weather.WindStrength - 1) / 3, 0.01f);
-                    }
-                }
+        if (_agent.pathPending) return;
+        if (!(_agent.remainingDistance <= _agent.stoppingDistance)) return;
+        if (_agent.hasPath && _agent.velocity.sqrMagnitude != 0f) return;
+        
+        _agent.ResetPath();
 
-        ;
+        if (_isCovered || flicking) return;
+        
+        _agent.updateRotation = false;
+        _agent.velocity = Vector3.Lerp(_agent.velocity,
+            _weather.WindDirection.normalized * (_weather.WindStrength - 1) / 3, 0.01f);
     }
 
 
-    public void setDestination(Vector3 des)
+    public void SetDestination(Vector3 des)
     {
-        agent.updateRotation = true;
-        agent.destination = des;
+        _agent.updateRotation = true;
+        _agent.destination = des;
         moving = true;
     }
 
-    public void stop()
+    public void Stop()
     {
-        agent.ResetPath();
+        _agent.ResetPath();
     }
 }

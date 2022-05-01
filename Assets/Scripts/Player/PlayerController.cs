@@ -38,7 +38,7 @@ public class PlayerController : MonoBehaviour
             RaycastHit hit;
             if (Physics.Raycast(cam.ScreenPointToRay(Input.mousePosition),out hit))
             {
-                navmas.setDestination(hit.point);
+                navmas.SetDestination(hit.point);
             }             
         }
 
@@ -63,7 +63,7 @@ public class PlayerController : MonoBehaviour
         float flickForce = minFlickForce;
         transform.LookAt(new Vector3(egg.transform.position.x, 0, egg.transform.position.z));
         navmas.flicking = true;
-        navmas.stop();
+        navmas.Stop();
         agent.updateRotation = false;
         agent.velocity = Vector3.zero;
         anim.SetTrigger("flick");
