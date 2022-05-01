@@ -8,7 +8,7 @@ public class Story : ScriptableObject
 {
     public string[] storyMessage;
     public AudioClip[] storyVoiceOver;
-    public Sprite backgroundImage;
+    public Sprite[] backgroundImage;
     
     //public GameObject textBoxPrefab;
 
